@@ -1,4 +1,4 @@
-ARG BASE_TAG="develop"
+ARG BASE_TAG="servers"
 ARG BASE_IMAGE="core-ubuntu-focal"
 FROM kasmweb/$BASE_IMAGE:$BASE_TAG
 USER root
@@ -12,8 +12,8 @@ WORKDIR $HOME
 
 
 # Install Google Chrome
-COPY ./src/ubuntu/install/chrome $INST_SCRIPTS/chrome/
-RUN bash $INST_SCRIPTS/chrome/install_chrome.sh  && rm -rf $INST_SCRIPTS/chrome/
+COPY ./src/ubuntu/install/vsftpd $INST_SCRIPTS/vsftpd/
+RUN bash $INST_SCRIPTS/vsftpd/install_vsftpd.sh  && rm -rf $INST_SCRIPTS/vsftpd/
 
 # Update the desktop environment to be optimized for a single application
 RUN cp $HOME/.config/xfce4/xfconf/single-application-xfce-perchannel-xml/* $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/
