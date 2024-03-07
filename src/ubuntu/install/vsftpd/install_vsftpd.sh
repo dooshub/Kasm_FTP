@@ -28,15 +28,15 @@ if [[ "${DISTRO}" == @(centos|oracle8|rockylinux9|rockylinux8|oracle9|almalinux9
     fi
   fi
   rm rdm.rpm
-elif [ "${DISTRO}" == "opensuse" ]; then
-  zypper ar http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
-  wget https://dl.google.com/linux/linux_signing_key.pub
-  rpm --import linux_signing_key.pub
-  rm linux_signing_key.pub
-  zypper install -yn google-chrome-stable
-  if [ -z ${SKIP_CLEAN+x} ]; then
-    zypper clean --all
-  fi
+#elif [ "${DISTRO}" == "opensuse" ]; then
+#  zypper ar http://dl.google.com/linux/chrome/rpm/stable/x86_64 Google-Chrome
+#  wget https://dl.google.com/linux/linux_signing_key.pub
+#  rpm --import linux_signing_key.pub
+#  rm linux_signing_key.pub
+#  zypper install -yn google-chrome-stable
+#  if [ -z ${SKIP_CLEAN+x} ]; then
+#    zypper clean --all
+#  fi
 else
   apt-get update
   if [ ! -z "${RDM_VERSION}" ]; then
@@ -60,24 +60,24 @@ cp /usr/share/applications/remotedesktopmanager.desktop $HOME/Desktop/
 chown 1000:1000 $HOME/Desktop/remotedesktopmanager.desktop
 chmod +x $HOME/Desktop/remotedesktopmanager.desktop
 
-mv /usr/bin/remotedesktopmanager /usr/bin/remotedesktopmanager-orig
-cat >/usr/bin/remotedesktopmanager <<EOL
-#!/usr/bin/env bash
-if ! pgrep rdm > /dev/null;then
-  rm -f \$HOME/.rdm/Singleton*
-fi
-sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/google-chrome/Default/Preferences
-sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' ~/.config/google-chrome/Default/Preferences
-if [ -f /opt/VirtualGL/bin/vglrun ] && [ ! -z "\${KASM_EGL_CARD}" ] && [ ! -z "\${KASM_RENDERD}" ] && [ -O "\${KASM_RENDERD}" ] && [ -O "\${KASM_EGL_CARD}" ] ; then
-    echo "Starting rdm with GPU Acceleration on EGL device \${KASM_EGL_CARD}"
-    vglrun -d "\${KASM_EGL_CARD}" /opt/google/chrome/google-chrome ${RDM_ARGS} "\$@" 
-else
+#mv /usr/bin/remotedesktopmanager /usr/bin/remotedesktopmanager-orig
+#cat >/usr/bin/remotedesktopmanager <<EOL
+##!/usr/bin/env bash
+#if ! pgrep rdm > /dev/null;then
+#  rm -f \$HOME/.rdm/Singleton*
+#fi
+#sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/google-chrome/Default/Preferences
+#sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' ~/.config/google-chrome/Default/Preferences
+#if [ -f /opt/VirtualGL/bin/vglrun ] && [ ! -z "\${KASM_EGL_CARD}" ] && [ ! -z "\${KASM_RENDERD}" ] && [ -O "\${KASM_RENDERD}" ] && [ -O "\${KASM_EGL_CARD}" ] ; then
+#    echo "Starting rdm with GPU Acceleration on EGL device \${KASM_EGL_CARD}"
+#    vglrun -d "\${KASM_EGL_CARD}" /opt/google/chrome/google-chrome ${RDM_ARGS} "\$@" 
+#else
     echo "Starting rdm"
     /bin/remotedesktopmanager ${RDM_ARGS}
-fi
-EOL
+#fi
+#EOL
 chmod +x /usr/bin/remotedesktopmanager
-cp /usr/bin/google-chrome /usr/bin/chrome
+#cp /usr/bin/google-chrome /usr/bin/chrome
 
 
 # Cleanup for app layer
