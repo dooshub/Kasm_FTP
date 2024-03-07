@@ -69,42 +69,16 @@ fi
 sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/google-chrome/Default/Preferences
 sed -i 's/"exit_type":"Crashed"/"exit_type":"None"/' ~/.config/google-chrome/Default/Preferences
 if [ -f /opt/VirtualGL/bin/vglrun ] && [ ! -z "\${KASM_EGL_CARD}" ] && [ ! -z "\${KASM_RENDERD}" ] && [ -O "\${KASM_RENDERD}" ] && [ -O "\${KASM_EGL_CARD}" ] ; then
-    echo "Starting Chrome with GPU Acceleration on EGL device \${KASM_EGL_CARD}"
+    echo "Starting rdm with GPU Acceleration on EGL device \${KASM_EGL_CARD}"
     vglrun -d "\${KASM_EGL_CARD}" /opt/google/chrome/google-chrome ${RDM_ARGS} "\$@" 
 else
-    echo "Starting Chrome"
-    /opt/google/chrome/google-chrome ${RDM_ARGS} "\$@"
+    echo "Starting rdm"
+    /bin/remotedesktopmanager ${RDM_ARGS}
 fi
 EOL
-chmod +x /usr/bin/google-chrome
+chmod +x /usr/bin/remotedesktopmanager
 cp /usr/bin/google-chrome /usr/bin/chrome
 
-if [[ "${DISTRO}" == @(centos|oracle8|rockylinux9|rockylinux8|oracle9|almalinux9|almalinux8|opensuse) ]]; then
-  cat >> $HOME/.config/mimeapps.list <<EOF
-    [Default Applications]
-    x-scheme-handler/http=google-chrome.desktop
-    x-scheme-handler/https=google-chrome.desktop
-    x-scheme-handler/ftp=google-chrome.desktop
-    x-scheme-handler/chrome=google-chrome.desktop
-    text/html=google-chrome.desktop
-    application/x-extension-htm=google-chrome.desktop
-    application/x-extension-html=google-chrome.desktop
-    application/x-extension-shtml=google-chrome.desktop
-    application/xhtml+xml=google-chrome.desktop
-    application/x-extension-xhtml=google-chrome.desktop
-    application/x-extension-xht=google-chrome.desktop
-EOF
-else
-  sed -i 's@exec -a "$0" "$HERE/google-chrome" "$\@"@@g' /usr/bin/x-www-browser
-  cat >>/usr/bin/x-www-browser <<EOL
-  exec -a "\$0" "\$HERE/chrome" "${RDM_ARGS}"  "\$@"
-EOL
-fi
-
-mkdir -p /etc/opt/chrome/policies/managed/
-cat >>/etc/opt/chrome/policies/managed/default_managed_policy.json <<EOL
-{"CommandLineFlagSecurityWarningsEnabled": false, "DefaultBrowserSettingEnabled": false}
-EOL
 
 # Cleanup for app layer
 chown -R 1000:0 $HOME
