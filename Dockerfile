@@ -12,8 +12,8 @@ WORKDIR $HOME
 
 
 # Install Google Chrome
-COPY ./src/ubuntu/install/vsftpd $INST_SCRIPTS/vsftpd/
-RUN bash $INST_SCRIPTS/vsftpd/install_vsftpd.sh  && rm -rf $INST_SCRIPTS/vsftpd/
+COPY ./src/ubuntu/install/rdm $INST_SCRIPTS/rdm/
+RUN bash $INST_SCRIPTS/rdm/install_rdm.sh  && rm -rf $INST_SCRIPTS/rdm/
 
 # Update the desktop environment to be optimized for a single application
 RUN cp $HOME/.config/xfce4/xfconf/single-application-xfce-perchannel-xml/* $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/
