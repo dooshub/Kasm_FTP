@@ -1,6 +1,4 @@
-ARG BASE_TAG="servers"
-ARG BASE_IMAGE="core-ubuntu-focal"
-FROM kasmweb/$BASE_IMAGE:$BASE_TAG
+FROM kasmweb/core-ubuntu-focal:1.15.0
 USER root
 
 ENV HOME /home/kasm-default-profile
@@ -10,35 +8,18 @@ WORKDIR $HOME
 
 ######### Customize Container Here ###########
 
+COPY ./software/ $INST_SCRIPTS/rdm/
 
-# Install Google Chrome
-COPY ./src/ubuntu/install/rdm $INST_SCRIPTS/rdm/
-RUN bash $INST_SCRIPTS/rdm/install_rdm.sh  && rm -rf $INST_SCRIPTS/rdm/
+RUN apt-get update \
+    && apt-get install -y apt-transport-https libwebkit2gtk-4.0 ca-certificates libsecret-1-0 gnome-keyring libvte-2.91 \
+    && sudo dpkg -i $INST_SCRIPTS/rdm/RemoteDesktopManager_2024.1.0.6_amd64.deb \
+    && rm /dockerstartup/install/rdm/RemoteDesktopManager_2024.1.0.6_amd64.deb \
+    && cp /usr/share/applications/remotedesktopmanager.desktop $HOME/Desktop/ \
+    && chmod +x $HOME/Desktop/remotedesktopmanager.desktop \
+    && chown 1000:1000 $HOME/Desktop/remotedesktopmanager.desktop
 
-# Update the desktop environment to be optimized for a single application
-RUN cp $HOME/.config/xfce4/xfconf/single-application-xfce-perchannel-xml/* $HOME/.config/xfce4/xfconf/xfce-perchannel-xml/
-RUN cp /usr/share/backgrounds/bg_kasm.png /usr/share/backgrounds/bg_default.png
-RUN apt-get remove -y xfce4-panel
-
-# Security modifications
-COPY ./src/ubuntu/install/misc/single_app_security.sh $INST_SCRIPTS/misc/
-RUN  bash $INST_SCRIPTS/misc/single_app_security.sh -t && rm -rf $INST_SCRIPTS/misc/
-COPY ./src/common/chrome-managed-policies/urlblocklist.json /etc/opt/chrome/policies/managed/urlblocklist.json
-
-# Setup the custom startup script that will be invoked when the container starts
-#ENV LAUNCH_URL  http://kasmweb.com
-
-COPY ./src/ubuntu/install/chrome/custom_startup.sh $STARTUPDIR/custom_startup.sh
-RUN chmod +x $STARTUPDIR/custom_startup.sh
-
-# Install Custom Certificate Authority
-# COPY ./src/ubuntu/install/certificates $INST_SCRIPTS/certificates/
-# RUN bash $INST_SCRIPTS/certificates/install_ca_cert.sh && rm -rf $INST_SCRIPTS/certificates/
-
-ENV KASM_RESTRICTED_FILE_CHOOSER=1
-COPY ./src/ubuntu/install/gtk/ $INST_SCRIPTS/gtk/
-RUN bash $INST_SCRIPTS/gtk/install_restricted_file_chooser.sh
-
+RUN echo "/usr/bin/desktop_ready && /usr/lib/devolutions/RemoteDesktopManager/RemoteDesktopManager &" > $STARTUPDIR/custom_startup.sh \
+    && chmod +x $STARTUPDIR/custom_startup.sh
 
 ######### End Customizations ###########
 
